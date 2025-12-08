@@ -1,10 +1,16 @@
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   try {
     const app = await NestFactory.create(AppModule);
+
+    const configService = app.get(ConfigService);
+    // app.enableCors({
+    //   origin: configService.get('CORS_ORIGIN'),
+    // });
 
     app.useGlobalPipes(
       new ValidationPipe({
@@ -20,7 +26,15 @@ async function bootstrap() {
     // I set a global prefix for all routes in the application and now it will be localhost:3000/api
     app.setGlobalPrefix('api');
 
-    await app.listen(process.env.PORT ?? 3000);
+    const port = configService.get<number>('PORT') || 3000;
+    // console.log(`Application is running on: http://localhost:${port}/api`);
+
+    const env = configService.get<string>('NODE_ENV');
+    if (env === 'development') {
+      app.enableCors();
+    }
+
+    await app.listen(port);
   } catch (error) {
     console.error('Error during application bootstrap:', error);
     process.exit(1);
