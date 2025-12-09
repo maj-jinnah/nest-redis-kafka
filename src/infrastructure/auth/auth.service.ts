@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
@@ -16,16 +21,15 @@ interface JwtPayload {
 export class AuthService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private readonly configService: ConfigService,
     private jwtService: JwtService,
   ) {}
 
-  private generateToken(user: JwtPayload): string {
-    const payload: JwtPayload = {
-      sub: user.sub,
-      email: user.email,
-      role: user.role,
-    };
-    return this.jwtService.sign(payload);
+  private generateToken(payload: JwtPayload): string {
+    return this.jwtService.sign(payload, {
+      secret: this.configService.get<string>('JWT_SECRET'),
+      expiresIn: '1d',
+    });
   }
 
   async login(loginDto: LoginDto) {
@@ -69,11 +73,13 @@ export class AuthService {
     // Check if user already exists
     const existingUser = await this.userModel.findOne({ email });
     if (existingUser) {
-      throw new UnauthorizedException('User already exists');
+      throw new ConflictException('User already exists');
     }
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    console.log('Hashed Password >_________', hashedPassword);
 
     // Create user
     const user = new this.userModel({
@@ -85,15 +91,6 @@ export class AuthService {
 
     await user.save();
 
-    const payload: JwtPayload = {
-      sub: user._id.toString(),
-      email: user.email,
-      role: user.role, // assuming role is string or string[]
-    };
-
-    // Generate JWT
-    const token = this.generateToken(payload);
-
     return {
       message: 'Registration successful',
       user: {
@@ -103,7 +100,6 @@ export class AuthService {
         lastName: user.lastName,
         role: user.role,
       },
-      token,
     };
   }
 }
