@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   try {
@@ -22,6 +23,31 @@ async function bootstrap() {
         },
       }),
     );
+
+    // Swagger Documentation
+    const config = new DocumentBuilder()
+      .setTitle('NEST.JS Learning API')
+      .setDescription(
+        'Doing some experiments with Nest.js framework for learning purposes.',
+      )
+      .setVersion('1.0')
+      .addTag('nest-js')
+      // ✅ Add Bearer Token Authentication
+      .addBearerAuth(
+        {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          name: 'Authorization',
+          description: 'Enter JWT token',
+          in: 'header',
+        },
+        'JWT-auth', // This name will be used in @ApiBearerAuth() decorator
+      )
+      .build();
+
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api/docs', app, document);
 
     // I set a global prefix for all routes in the application and now it will be localhost:3000/api
     app.setGlobalPrefix('api');
