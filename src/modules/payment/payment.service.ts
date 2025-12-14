@@ -17,10 +17,6 @@ export class PaymentService {
   ) {}
 
   async processPayment(body: Body): Promise<PaymentResponse> {
-    // Placeholder for payment processing logic
-    // return { message: 'Payment processed successfully' };
-    // console.log('Payment service is hitted');
-    // console.log('Body I passed >_____', body);
     await this.paymentSuccessfulEvent.emitPaymentSuccessfulEvent(body);
 
     return {

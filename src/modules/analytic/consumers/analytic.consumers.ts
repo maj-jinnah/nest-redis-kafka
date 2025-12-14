@@ -25,7 +25,7 @@ export class AnalyticConsumers
     await this.connect();
   }
 
-  protected processMessage({
+  protected async processMessage({
     topic,
     partition,
     message,
@@ -36,11 +36,13 @@ export class AnalyticConsumers
       message,
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const event = JSON.parse(message.value?.toString() || '[]');
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const event = JSON.parse(message.value?.toString() || '[]');
 
-    console.log('Parsed event: ', event);
-
-    return Promise.resolve();
+      console.log('Parsed event: ', event);
+    } catch (error) {
+      console.error('Error parsing message:', error);
+    }
   }
 }

@@ -11,8 +11,6 @@ export class PaymentController {
   @Post()
   @HttpCode(HttpStatus.OK)
   async processPayment(@Body() body: PaymentDto) {
-    // console.log('Body I passed >_____', body);
-
     const data = await this.paymentService.processPayment(body);
 
     return {

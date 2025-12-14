@@ -79,7 +79,7 @@ export class AuthService {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    console.log('Hashed Password >_________', hashedPassword);
+    // console.log('Hashed Password >_________', hashedPassword);
 
     // Create user
     const user = new this.userModel({

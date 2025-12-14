@@ -7,9 +7,6 @@ export class PaymentSuccessfulEvent {
 
   async emitPaymentSuccessfulEvent(paymentData: any): Promise<void> {
     const topic = 'payment-successful-topic';
-    const message = {
-      value: JSON.stringify(paymentData),
-    };
-    await this.kafkaService.send(topic, message);
+    await this.kafkaService.send(topic, paymentData); // ← Send object directly, no JSON.stringify!
   }
 }

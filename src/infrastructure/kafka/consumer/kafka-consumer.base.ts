@@ -47,7 +47,7 @@ export abstract class KafkaConsumerBase implements OnModuleDestroy {
         eachMessage: async (payload: EachMessagePayload) => {
           try {
             this.logger.log(`Processing message from topic ${payload.topic}`);
-            console.log('Message payload>_____ ', payload);
+            // console.log('Message payload>_____ ', payload);
 
             await this.processMessage(payload);
           } catch (error) {
