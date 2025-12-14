@@ -4,6 +4,7 @@ import { KafkaService } from 'src/infrastructure/kafka/kafka.service';
 @Injectable()
 export class PaymentSuccessfulEvent {
   constructor(private readonly kafkaService: KafkaService) {}
+
   async emitPaymentSuccessfulEvent(paymentData: any): Promise<void> {
     const topic = 'payment-successful-topic';
     const message = {
